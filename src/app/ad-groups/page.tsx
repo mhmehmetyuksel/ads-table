@@ -7,9 +7,8 @@ const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
 export default function Home() {
   const dispatch = useAppDispatch();
-  const adSets = useAppSelector((state) => state.adsReducer.adSets);
-  const filters = useAppSelector((state) => state.adsReducer.adSetFilters);
-  const adsFilters = useAppSelector((state) => state.adsReducer.adFilters)
+  const adsReducer = useAppSelector((state) => state.adsReducer);
+  const { adSets, adSetFilters, adFilters } = adsReducer;
   const { data, error } = useSWR("/api/getAdGroups", fetcher, {
     revalidateOnFocus: false,
     revalidateOnMount: !(adSets.length > 0),
@@ -29,7 +28,9 @@ export default function Home() {
   }
 
   let filtered = data.filter((adSet: AdSet) =>
-    filters.length > 0 ? filters.includes(String(adSet.campaignId)) : true
+    adSetFilters.length > 0
+      ? adSetFilters.includes(String(adSet.campaignId))
+      : true
   );
 
   return (
@@ -55,10 +56,15 @@ export default function Home() {
                 <tr>
                   <td className="border border-separate border-black px-3 py-1">
                     <input
-                      defaultChecked={adsFilters.includes(String(adSet.id))}
+                      defaultChecked={adFilters.includes(String(adSet.id))}
                       name={String(adSet.id)}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        dispatch(setAdFilter({id: e.target.name, checked: e.target.checked}))
+                        dispatch(
+                          setAdFilter({
+                            id: e.target.name,
+                            checked: e.target.checked,
+                          })
+                        )
                       }
                       type="checkbox"
                     />

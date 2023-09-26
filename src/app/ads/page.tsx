@@ -7,8 +7,9 @@ const fetcher = (url: any) => fetch(url).then((res) => res.json());
 
 export default function Home() {
   const dispatch = useAppDispatch();
-  const ads = useAppSelector((state) => state.adsReducer.ads);
-  const filters = useAppSelector((state) => state.adsReducer.adFilters);
+  const adsReducer = useAppSelector((state) => state.adsReducer);
+
+  const { ads, adFilters } = adsReducer
 
   const { data, error } = useSWR("/api/getAds", fetcher, {
     revalidateOnFocus: false,
@@ -29,7 +30,7 @@ export default function Home() {
   }
 
   let filtered = ads.filter((ad: Ad) =>
-    filters.length > 0 ? filters.includes(String(ad.adsetId)) : true
+    adFilters.length > 0 ? adFilters.includes(String(ad.adsetId)) : true
   );
 
   return (

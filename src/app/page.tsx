@@ -1,36 +1,52 @@
 "use client";
 import { Campaign, setAdSetFilter, setCampaigns } from "@/redux/ads-slice";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
+import { useEffect, useState } from "react";
 import { TableVirtuoso } from "react-virtuoso";
 import useSWR from "swr";
 
-const fetcher = (url: any) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
+
+  const [state, setState] = useState<Campaign[]>([])
   const dispatch = useAppDispatch();
-  const adsReducer = useAppSelector((state) => state.adsReducer);
-  const { campaigns, adSetFilters } = adsReducer;
+  const adsReducer = useAppSelector((state) => state.adsReducer)
+
+  const { campaigns, adSetFilters } = adsReducer
+
   const { data, error } = useSWR("/api/getCampaigns", fetcher, {
     revalidateOnFocus: false,
     revalidateOnMount: !(campaigns.length > 0),
     refreshInterval: 0,
   });
 
+  useEffect(() => {
+    if (data) {
+      setState(data)
+    }
+  }, [data])
+
   //Handle the error state
   if (error) {
-    console.log(error, "erorr");
     return <div>Failed to load</div>;
   }
   //Handle the loading state
   if (!data) return <div>Loading...</div>;
   //Handle the ready state and display the result contained in the data object mapped to the structure of the json file
-  if (data) {
-    dispatch(setCampaigns(data));
+
+  
+
+  const handleSort = () => {
+    let copyState = [...state]
+    let sorted = copyState.sort((a: Campaign, b: Campaign) => a?.addtoCartValue - b?.addtoCartValue < 0 ? 1 : -1)
+    setState(sorted)
   }
   return (
     <>
+    <button onClick={() => handleSort()}>Sırala</button>
        <TableVirtuoso
-      data={campaigns}
+      data={state.length > 0 ? state : campaigns}
       useWindowScroll
       fixedHeaderContent={() => (
         <tr className="bg-red-400">
