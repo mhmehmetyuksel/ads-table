@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import {useSelector, TypedUseSelectorHook, useDispatch} from "react-redux"
 import adsReducer from './ads-slice'
 export const store = configureStore({
+    devTools: true,
     reducer: {
         adsReducer
     }

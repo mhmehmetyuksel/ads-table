@@ -7,5 +7,5 @@ export async function GET() {
   //Read the json data file data.json
   const fileContents = await fs.readFile(jsonDirectory + '/adset.json', 'utf8');
   //Return the content of the data file in json format
-  return NextResponse.json(fileContents)
+  return NextResponse.json(JSON.parse(fileContents))
 }

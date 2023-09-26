@@ -43,18 +43,43 @@ export interface Campaign {
 }
 
 const initialState = {
-        ad: [] as Ad[],
-        adSet: [] as AdSet[],
-        campaign: [] as Campaign[]
+        ads: [] as Ad[],
+        adFilters: [] as string[],
+        adSets: [] as AdSet[],
+        adSetFilters: [] as string[],
+        campaigns: [] as Campaign[]
 }
 
 export const ads = createSlice({
-    name: 'ads',
+    name: 'adStore',
     initialState: initialState,
     reducers: {
+        setCampaigns: (state, { payload }) => {
+            state.campaigns = payload
+        },
+        setAdSets: (state, { payload }) => {
+            state.adSets = payload
+        },
+        setAds: (state, { payload }) => {
+            state.ads = payload
+        },
+        setAdSetFilter: (state, { payload }) => {
+            if(payload.checked) {
+                state.adSetFilters.push(payload.id)
+            } else {
+                state.adSetFilters = state.adSetFilters.filter((filter: string) => filter !== payload.id)
+            }
+        },
+        setAdFilter: (state, { payload }) => {
+            if(payload.checked) {
+                state.adFilters.push(payload.id)
+            } else {
+                state.adFilters = state.adFilters.filter((filter: string) => filter !== payload.id)
+            }
+        }
     }
 })
 
-export const { } = ads.actions
+export const { setCampaigns, setAdSets, setAds, setAdSetFilter, setAdFilter } = ads.actions
 
 export default ads.reducer
