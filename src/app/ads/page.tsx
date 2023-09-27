@@ -55,7 +55,10 @@ export default function Home() {
         sorted = copyState.sort((a: Omit<Ad, "status" | "name">, b: Omit<Ad, "status" | "name">) => a[key] - b[key] < 0 ? -1 : 1)
       } else {
         setCurrentSortKey({ key: '', status: '' })
-        setState(data)
+        let filtered = ads.filter((ad: Ad) =>
+        adFilters.length > 0 ? adFilters.includes(String(ad.adsetId)) : true
+      );
+      setState(filtered)
         return
       }
     } else {
