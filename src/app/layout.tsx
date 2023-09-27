@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <div className='container mx-auto'>
-          <div className='h-14 w-[1328] bg-white rounded-lg flex justify-between items-center'>
+          <div className='h-14 bg-white rounded-lg flex justify-between items-center'>
             <Link href="/"><button className='w-[426px] h-10 rounded-lg px-4 py-2 bg-[#F9F9F9]'>Kampanyalar</button></Link>         
             <Link href="/ad-groups"><button className='w-[426px] h-10 rounded-lg px-4 py-2 bg-[#F9F9F9]'>Reklam Grupları</button></Link>
             <Link href="/ads"><button className='w-[426px] h-10 rounded-lg px-4 py-2 bg-[#F9F9F9]'>Reklamlar</button></Link>     

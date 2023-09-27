@@ -19,11 +19,15 @@
     "next": "13.5.2",
     "postcss": "8.4.30",
     "react": "18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "18.2.0",
     "react-redux": "^8.1.2",
     "react-virtuoso": "^4.6.0",
     "swr": "^2.2.4",
     "tailwindcss": "3.3.3",
     "typescript": "5.2.2"
+  },
+  "devDependencies": {
+    "@types/react-beautiful-dnd": "^13.1.4"
   }
 }
