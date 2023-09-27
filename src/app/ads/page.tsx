@@ -7,22 +7,23 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { TableVirtuoso } from "react-virtuoso";
 import useSWR from "swr";
 
-const fetcher = (url: any) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
   const dispatch = useAppDispatch();
+
   const adsReducer = useAppSelector((state) => state.adsReducer);
+  const { ads, adFilters } = adsReducer
+
   const [columnWidth, setColumnWidth] = useState(800);
   const [state, setState] = useState<Ad[]>([])
-  const [currentSortKey, setCurrentSortKey] = useState<any>({ key: '', status: '' })
-  const { ads, adFilters } = adsReducer
+  const [currentSortKey, setCurrentSortKey] = useState<{ key: string, status: string }>({ key: '', status: '' })
 
   const { data, error } = useSWR("/api/getAds", fetcher, {
     revalidateOnFocus: false,
     revalidateOnMount: !(ads.length > 0),
     refreshInterval: 0,
   });
-
 
   useEffect(() => {
     if (data) {
@@ -32,7 +33,6 @@ export default function Home() {
       setState(filtered)
     }
   }, [data])
-
 
   //Handle the error state
   if (error) {
@@ -46,13 +46,13 @@ export default function Home() {
     dispatch(setAds(data));
   }
 
-  const handleSort = (key: keyof Ad) => {
+  const handleSort = (key: keyof Omit<Ad, "status" | "name">) => {
     let sorted: Ad[]
     let copyState = [...state]
     if (key === currentSortKey.key) {
       if (currentSortKey.status === 'desc') {
         setCurrentSortKey({ key, status: 'asc' })
-        sorted = copyState.sort((a: any, b: any) => a[key] - b[key] < 0 ? -1 : 1)
+        sorted = copyState.sort((a: Omit<Ad, "status" | "name">, b: Omit<Ad, "status" | "name">) => a[key] - b[key] < 0 ? -1 : 1)
       } else {
         setCurrentSortKey({ key: '', status: '' })
         setState(data)
@@ -60,21 +60,21 @@ export default function Home() {
       }
     } else {
       setCurrentSortKey({ key, status: 'desc' })
-      sorted = copyState.sort((a: any, b: any) => a[key] - b[key] < 0 ? 1 : -1)
+      sorted = copyState.sort((a: Omit<Ad, "status" | "name">, b: Omit<Ad, "status" | "name">) => a[key] - b[key] < 0 ? 1 : -1)
     }
     setState(sorted)
   }
 
-  const onDragEnd = (result: any) => {
-
+  const onDragEnd = () => {
+    console.log("Drag Success")
   }
 
-  const handleColumnResizeStart = (e: any) => {
+  const handleColumnResizeStart = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.preventDefault();
     const initialX = e.clientX;
     const initialWidth = columnWidth || 800;
 
-    const handleMouseMove = (e: any) => {
+    const handleMouseMove = (e: MouseEvent) => {
       const widthChange = e.clientX - initialX;
       const newWidth = initialWidth + widthChange * 4.5;
 
@@ -93,8 +93,6 @@ export default function Home() {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
   };
-
-
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

@@ -10,14 +10,14 @@ import Loading from "@/components/Loading";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
+  const dispatch = useAppDispatch()
+
+  const adsReducer = useAppSelector((state) => state.adsReducer)
+  const { campaigns, adSetFilters } = adsReducer
+
   const [columnWidth, setColumnWidth] = useState(800);
   const [state, setState] = useState<Campaign[]>([])
-  const [currentSortKey, setCurrentSortKey] = useState<any>({ key: '', status: '' })
-
-  const dispatch = useAppDispatch();
-  const adsReducer = useAppSelector((state) => state.adsReducer)
-
-  const { campaigns, adSetFilters } = adsReducer
+  const [currentSortKey, setCurrentSortKey] = useState<{ key: string, status: string }>({ key: '', status: '' })
 
   const { data, error } = useSWR("/api/getCampaigns", fetcher, {
     revalidateOnFocus: false,
@@ -39,13 +39,13 @@ export default function Home() {
   if (!data) return <Loading />
   //Handle the ready state and display the result contained in the data object mapped to the structure of the json file
 
-  const handleSort = (key: keyof Campaign) => {
+  const handleSort = (key: keyof Omit<Campaign, "status" | "name">) => {
     let sorted: Campaign[]
     let copyState = [...state]
     if (key === currentSortKey.key) {
       if (currentSortKey.status === 'desc') {
         setCurrentSortKey({ key, status: 'asc' })
-        sorted = copyState.sort((a: any, b: any) => a[key] - b[key] < 0 ? -1 : 1)
+        sorted = copyState.sort((a: Omit<Campaign, "status" | "name">, b: Omit<Campaign, "status" | "name">) => a[key] - b[key] < 0 ? -1 : 1)
       } else {
         setCurrentSortKey({ key: '', status: '' })
         setState(data)
@@ -53,21 +53,21 @@ export default function Home() {
       }
     } else {
       setCurrentSortKey({ key, status: 'desc' })
-      sorted = copyState.sort((a: any, b: any) => a[key] - b[key] < 0 ? 1 : -1)
+      sorted = copyState.sort((a: Omit<Campaign, "status" | "name">, b: Omit<Campaign, "status" | "name">) => a[key] - b[key] < 0 ? 1 : -1)
     }
     setState(sorted)
   }
 
-  const onDragEnd = (result: any) => {
-
+  const onDragEnd = () => {
+    console.log("Drag Success")
   }
 
-  const handleColumnResizeStart = (e: any) => {
+  const handleColumnResizeStart = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.preventDefault();
     const initialX = e.clientX;
     const initialWidth = columnWidth || 800;
 
-    const handleMouseMove = (e: any) => {
+    const handleMouseMove = (e: MouseEvent) => {
       const widthChange = e.clientX - initialX;
       const newWidth = initialWidth + widthChange * 4.5;
 
@@ -85,7 +85,7 @@ export default function Home() {
     // onMouseMove ve onMouseUp olaylarını dinle
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  };
+  }
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
